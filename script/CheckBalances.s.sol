@@ -53,7 +53,9 @@ contract CheckBalances is Script {
             console.log("   https://www.alchemy.com/faucets/base-sepolia");
             console.log("");
             console.log("2. Wrap ETH to WETH:");
-            console.log("   Visit: https://sepolia.basescan.org/address/0x4200000000000000000000000000000000000006#writeContract");
+            console.log(
+                "   Visit: https://sepolia.basescan.org/address/0x4200000000000000000000000000000000000006#writeContract"
+            );
             console.log("   Call: deposit() with value");
             console.log("");
             console.log("3. Get USDC from Aave Faucet:");

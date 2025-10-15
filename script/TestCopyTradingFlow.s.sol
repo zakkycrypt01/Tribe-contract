@@ -43,7 +43,7 @@ contract TestCopyTradingFlow is Script {
         // Step 1: Get or create vault for user following themselves (for test purposes)
         console.log("--- Step 1: Get Follower Vault ---");
         address vaultAddress = TribeVaultFactory(VAULT_FACTORY).getVault(user, user);
-        
+
         if (vaultAddress == address(0)) {
             console.log("Creating new vault...");
             vaultAddress = TribeVaultFactory(VAULT_FACTORY).createVault(user);
@@ -51,7 +51,7 @@ contract TestCopyTradingFlow is Script {
         } else {
             console.log("Existing vault:", vaultAddress);
         }
-        
+
         TribeCopyVault vault = TribeCopyVault(vaultAddress);
         console.log("");
 
@@ -59,12 +59,12 @@ contract TestCopyTradingFlow is Script {
         console.log("--- Step 2: Deposit to Follower Vault ---");
         uint256 depositAmountUSDC = 1e6; // 1 USDC
         uint256 depositAmountWETH = 0.01 ether; // 0.01 WETH
-        
+
         uint256 usdcBalance = IERC20(USDC).balanceOf(user);
         uint256 wethBalance = IERC20(WETH).balanceOf(user);
         console.log("User USDC Balance:", usdcBalance);
         console.log("User WETH Balance:", wethBalance);
-        
+
         if (usdcBalance >= depositAmountUSDC) {
             IERC20(USDC).approve(vaultAddress, depositAmountUSDC);
             vault.deposit(USDC, depositAmountUSDC);
@@ -72,7 +72,7 @@ contract TestCopyTradingFlow is Script {
         } else {
             console.log("Insufficient USDC for deposit");
         }
-        
+
         if (wethBalance >= depositAmountWETH) {
             IERC20(WETH).approve(vaultAddress, depositAmountWETH);
             vault.deposit(WETH, depositAmountWETH);
@@ -80,7 +80,7 @@ contract TestCopyTradingFlow is Script {
         } else {
             console.log("Insufficient WETH for deposit");
         }
-        
+
         uint256 vaultCapital = vault.depositedCapital();
         uint256 vaultHWM = vault.highWaterMark();
         console.log("Vault Deposited Capital:", vaultCapital);
@@ -89,54 +89,54 @@ contract TestCopyTradingFlow is Script {
 
         // Step 3: Leader adds liquidity (user is both leader and follower for test)
         console.log("--- Step 3: Leader Adds Liquidity via Terminal ---");
-        
+
         // Check if user is registered as leader
         bool isLeader = TribeLeaderRegistry(LEADER_REGISTRY).isRegisteredLeader(user);
         console.log("Is Registered Leader:", isLeader);
-        
+
         if (!isLeader) {
             console.log("ERROR: User must be registered as leader first");
             console.log("Run TestLeaderRegistration.s.sol first");
             vm.stopBroadcast();
             return;
         }
-        
+
         // Determine token order
         address token0 = USDC < WETH ? USDC : WETH;
         address token1 = USDC < WETH ? WETH : USDC;
-        
+
         uint256 leaderAmount0 = 0.5e6; // 0.5 USDC
         uint256 leaderAmount1 = 0.005 ether; // 0.005 WETH
-        
+
         uint256 amount0Desired = token0 == USDC ? leaderAmount0 : leaderAmount1;
         uint256 amount1Desired = token1 == USDC ? leaderAmount0 : leaderAmount1;
-        
+
         console.log("Token0:", token0);
         console.log("Token1:", token1);
         console.log("Amount0 Desired:", amount0Desired);
         console.log("Amount1 Desired:", amount1Desired);
-        
+
         // Check leader balances
         uint256 leaderUSDC = IERC20(USDC).balanceOf(user);
         uint256 leaderWETH = IERC20(WETH).balanceOf(user);
         console.log("Leader USDC Balance:", leaderUSDC);
         console.log("Leader WETH Balance:", leaderWETH);
-        
+
         if (leaderUSDC < leaderAmount0 || leaderWETH < leaderAmount1) {
             console.log("ERROR: Insufficient balance for liquidity addition");
             vm.stopBroadcast();
             return;
         }
-        
+
         // Approve tokens for LeaderTerminal
         IERC20(token0).approve(LEADER_TERMINAL, amount0Desired);
         IERC20(token1).approve(LEADER_TERMINAL, amount1Desired);
         console.log("Approved tokens for LeaderTerminal");
-        
+
         // Record vault state before
         uint256 vaultPositionsBefore = vault.getActivePositionCount();
         console.log("Vault Active Positions Before:", vaultPositionsBefore);
-        
+
         // Execute liquidity addition
         try TribeLeaderTerminal(LEADER_TERMINAL).addLiquidityUniswapV3(
             token0,
@@ -147,25 +147,25 @@ contract TestCopyTradingFlow is Script {
             amount0Desired,
             amount1Desired,
             0, // amount0Min
-            0  // amount1Min
+            0 // amount1Min
         ) returns (uint256 tokenId, uint128 liquidity) {
             console.log("");
             console.log("=== LIQUIDITY ADDED ===");
             console.log("Position Token ID:", tokenId);
             console.log("Liquidity Amount:", liquidity);
-            
+
             // Check vault state after
             uint256 vaultPositionsAfter = vault.getActivePositionCount();
             console.log("");
             console.log("=== VAULT STATE AFTER ===");
             console.log("Vault Active Positions After:", vaultPositionsAfter);
             console.log("New Positions Created:", vaultPositionsAfter - vaultPositionsBefore);
-            
+
             // Get position details
             if (vaultPositionsAfter > vaultPositionsBefore) {
                 TribeCopyVault.Position[] memory positions = vault.getAllPositions();
                 console.log("Total Positions in Vault:", positions.length);
-                
+
                 if (positions.length > 0) {
                     TribeCopyVault.Position memory lastPos = positions[positions.length - 1];
                     console.log("Last Position Protocol:", lastPos.protocol);
@@ -175,11 +175,10 @@ contract TestCopyTradingFlow is Script {
                     console.log("Last Position Is Active:", lastPos.isActive);
                 }
             }
-            
+
             console.log("");
             console.log("=== COPY TRADING SUCCESSFUL ===");
             console.log("Leader position created and mirrored to follower vault!");
-            
         } catch Error(string memory reason) {
             console.log("");
             console.log("ERROR: Failed to add liquidity");
@@ -190,7 +189,7 @@ contract TestCopyTradingFlow is Script {
         }
 
         vm.stopBroadcast();
-        
+
         console.log("");
         console.log("=== TEST COMPLETED ===");
     }
