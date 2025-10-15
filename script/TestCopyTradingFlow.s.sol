@@ -57,8 +57,8 @@ contract TestCopyTradingFlow is Script {
 
         // Step 2: Deposit capital to follower vault
         console.log("--- Step 2: Deposit to Follower Vault ---");
-        uint256 depositAmountUSDC = 1e6; // 1 USDC
-        uint256 depositAmountWETH = 0.01 ether; // 0.01 WETH
+        uint256 depositAmountUSDC = 2e5; // 0.2 USDC (reduced to fit faucet balance)
+        uint256 depositAmountWETH = 0.001 ether; // 0.001 WETH (reduced)
 
         uint256 usdcBalance = IERC20(USDC).balanceOf(user);
         uint256 wethBalance = IERC20(WETH).balanceOf(user);
@@ -105,8 +105,8 @@ contract TestCopyTradingFlow is Script {
         address token0 = USDC < WETH ? USDC : WETH;
         address token1 = USDC < WETH ? WETH : USDC;
 
-        uint256 leaderAmount0 = 0.5e6; // 0.5 USDC
-        uint256 leaderAmount1 = 0.005 ether; // 0.005 WETH
+        uint256 leaderAmount0 = 1e5; // 0.1 USDC (reduced)
+        uint256 leaderAmount1 = 0.0005 ether; // 0.0005 WETH (reduced)
 
         uint256 amount0Desired = token0 == USDC ? leaderAmount0 : leaderAmount1;
         uint256 amount1Desired = token1 == USDC ? leaderAmount0 : leaderAmount1;

@@ -1,0 +1,73 @@
+No files changed, compilation skipped
+Script ran successfully.
+
+== Logs ==
+  Deploying contracts with account: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  Account balance: 2104979789749997806
+  
+1. Deploying TribeLeaderRegistry...
+  TribeLeaderRegistry deployed at: 0x9ddf0EB842C45E3DFA15d9270A086BCd41a8C8c9
+  
+2. Deploying TribeVaultFactory...
+  TribeVaultFactory deployed at: 0x66065E6e1e1b7f814416f9A90e3C233FBB2BCDd3
+  
+3. Deploying TribeLeaderTerminal...
+  TribeLeaderTerminal deployed at: 0xF9C37099EA23388c965b390E74B3B201FEd75d81
+  
+4. Setting Terminal address in VaultFactory...
+  Terminal address set in VaultFactory
+  
+5. Deploying TribePerformanceTracker...
+  TribePerformanceTracker deployed at: 0xDaca23bcc33A8d167A95692420710C75F9FB5382
+  
+6. Deploying TribeLeaderboard...
+  TribeLeaderboard deployed at: 0x53E90790647225804cb4643a361a7083Fa67AD7b
+  
+7. Deploying TribeUniswapV3Adapter...
+  TribeUniswapV3Adapter deployed at: 0x7F106E5C45f5Fb770454C82424CCd845aAc23814
+  
+8. Skipping TribeAerodromeAdapter (no router address configured)
+  
+=== DEPLOYMENT SUMMARY ===
+  Network: Base Sepolia (Chain ID: 84532)
+  Deployer: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  
+Core Contracts:
+  - TribeLeaderRegistry: 0x9ddf0EB842C45E3DFA15d9270A086BCd41a8C8c9
+  - TribeVaultFactory: 0x66065E6e1e1b7f814416f9A90e3C233FBB2BCDd3
+  - TribeLeaderTerminal: 0xF9C37099EA23388c965b390E74B3B201FEd75d81
+  
+Auxiliary Contracts:
+  - TribeLeaderboard: 0x53E90790647225804cb4643a361a7083Fa67AD7b
+  - TribePerformanceTracker: 0xDaca23bcc33A8d167A95692420710C75F9FB5382
+  
+Adapters:
+  - TribeUniswapV3Adapter: 0x7F106E5C45f5Fb770454C82424CCd845aAc23814
+  
+=========================
+
+  Deployment addresses saved to deployments/base-sepolia.txt
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 84532
+
+Estimated gas price: 0.00100026 gwei
+
+Estimated total gas used for script: 14018991
+
+Estimated amount required: 0.00001402263593766 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/zakky/Downloads/Tribe/broadcast/Deploy.s.sol/84532/run-latest.json
+
+Sensitive values saved to: /home/zakky/Downloads/Tribe/cache/Deploy.s.sol/84532/run-latest.json
+

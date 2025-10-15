@@ -1,0 +1,42 @@
+No files changed, compilation skipped
+Script ran successfully.
+
+== Logs ==
+  Historical positions submitted.
+  Leader registered.
+  Strategy updated.
+  Leader deactivated.
+  Leader reactivated.
+  Leader info:
+  wallet: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  strategyName: Updated Strategy
+  description: Updated description.
+  isActive: true
+  registrationTime: 1760564134
+  totalFollowers: 0
+  totalTvl: 0
+  performanceFeePercent: 1000
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 84532
+
+Estimated gas price: 0.00100025 gwei
+
+Estimated total gas used for script: 1740194
+
+Estimated amount required: 0.0000017406290485 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/zakky/Downloads/Tribe/broadcast/TestLeaderRegistration.s.sol/84532/run-latest.json
+
+Sensitive values saved to: /home/zakky/Downloads/Tribe/cache/TestLeaderRegistration.s.sol/84532/run-latest.json
+

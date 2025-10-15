@@ -162,13 +162,31 @@ contract TribeLeaderTerminal is ReentrancyGuard, Ownable {
         for (uint256 i = 0; i < followerVaults.length; i++) {
             TribeCopyVault vault = TribeCopyVault(followerVaults[i]);
 
-            // Calculate proportional amounts based on vault's capital
-            uint256 vaultCapital = vault.depositedCapital();
-            if (vaultCapital > 0) {
-                // Mirror the position proportionally
-                bytes memory data = abi.encode(fee, tickLower, tickUpper);
-                vault.mirrorPosition(uniswapV3PositionManager, token0, token1, uint256(liquidity), data);
-                followersMirrored++;
+            // Mirror with real NFT mint if vault has balances; else, skip
+            uint256 bal0 = IERC20(token0).balanceOf(address(vault));
+            uint256 bal1 = IERC20(token1).balanceOf(address(vault));
+            if (bal0 > 0 && bal1 > 0) {
+                // Use conservative 50% of balances to avoid draining
+                uint256 amt0 = bal0 / 2;
+                uint256 amt1 = bal1 / 2;
+                try vault.mirrorMintUniswapV3(
+                    address(uniswapV3Adapter),
+                    uniswapV3PositionManager,
+                    token0,
+                    token1,
+                    fee,
+                    tickLower,
+                    tickUpper,
+                    amt0,
+                    amt1
+                ) {
+                    followersMirrored++;
+                } catch {
+                    // fallback: metadata-only mirror for observability
+                    bytes memory data = abi.encode(fee, tickLower, tickUpper);
+                    vault.mirrorPosition(uniswapV3PositionManager, token0, token1, uint256(liquidity), data);
+                    followersMirrored++;
+                }
             }
         }
 

@@ -1,0 +1,73 @@
+Compiling 1 files with Solc 0.8.26
+Solc 0.8.26 finished in 12.16s
+Compiler run successful!
+Script ran successfully.
+
+== Logs ==
+  === TESTING COPY TRADING FLOW ===
+  User Address: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  
+  --- Step 1: Get Follower Vault ---
+  Existing vault: 0x2E32D35E8C4aBf8d2649aa26314956bEf0449cE9
+  
+  --- Step 2: Deposit to Follower Vault ---
+  User USDC Balance: 300094
+  User WETH Balance: 2000000000009992
+  Deposited USDC: 200000
+  Deposited WETH: 1000000000000000
+  Vault Deposited Capital: 1000000000200000
+  Vault High Water Mark: 200000
+  
+  --- Step 3: Leader Adds Liquidity via Terminal ---
+  Is Registered Leader: true
+  Token0: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+  Token1: 0x4200000000000000000000000000000000000006
+  Amount0 Desired: 100000
+  Amount1 Desired: 500000000000000
+  Leader USDC Balance: 100094
+  Leader WETH Balance: 1000000000009992
+  Approved tokens for LeaderTerminal
+  Vault Active Positions Before: 0
+  
+  === LIQUIDITY ADDED ===
+  Position Token ID: 71034
+  Liquidity Amount: 1961179343
+  
+  === VAULT STATE AFTER ===
+  Vault Active Positions After: 1
+  New Positions Created: 1
+  Total Positions in Vault: 1
+  Last Position Protocol: 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2
+  Last Position Token0: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+  Last Position Token1: 0x4200000000000000000000000000000000000006
+  Last Position Liquidity: 1961179343
+  Last Position Is Active: true
+  
+  === COPY TRADING SUCCESSFUL ===
+  Leader position created and mirrored to follower vault!
+  
+  === TEST COMPLETED ===
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 84532
+
+Estimated gas price: 0.001000234 gwei
+
+Estimated total gas used for script: 2227897
+
+Estimated amount required: 0.000002228418327898 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/zakky/Downloads/Tribe/broadcast/TestCopyTradingFlow.s.sol/84532/run-latest.json
+
+Sensitive values saved to: /home/zakky/Downloads/Tribe/cache/TestCopyTradingFlow.s.sol/84532/run-latest.json
+

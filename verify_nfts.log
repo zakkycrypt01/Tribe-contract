@@ -1,0 +1,36 @@
+Compiling 1 files with Solc 0.8.26
+Solc 0.8.26 finished in 7.04s
+Compiler run successful!
+Script ran successfully.
+
+== Logs ==
+  === VERIFYING FOLLOWER VAULT NFT OWNERSHIP ===
+  User Address: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  
+  Follower Vault: 0x2E32D35E8C4aBf8d2649aa26314956bEf0449cE9
+  
+  Positions Recorded in Vault: 1
+  
+  --- Position 0 ---
+  Protocol: 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2
+  Token0: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+  Token1: 0x4200000000000000000000000000000000000006
+  Liquidity: 1961179343
+  TokenId: 71035
+  Is Active: true
+  
+  === ACTUAL NFT OWNERSHIP ===
+  Vault's Uniswap V3 NFT Balance: 1
+  
+  Vault owns the following NFT token IDs:
+    NFT # 71035
+  
+  [OK] Follower vault DOES own real Uniswap V3 NFT positions!
+  
+  === LEADER NFT OWNERSHIP (for comparison) ===
+  Leader's Uniswap V3 NFT Balance: 4
+  Leader owns the following NFT token IDs:
+    NFT # 71018
+    NFT # 71031
+    NFT # 71032
+    NFT # 71034

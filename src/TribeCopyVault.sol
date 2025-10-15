@@ -49,6 +49,8 @@ contract TribeCopyVault is ReentrancyGuard, Ownable {
     event EmergencyModeActivated(address indexed follower);
     event PerformanceFeeCollected(address indexed leader, uint256 amount);
 
+    event PositionMinted(uint256 indexed positionId, uint256 tokenId, uint256 liquidity);
+
     modifier onlyFollower() {
         require(msg.sender == FOLLOWER, "Only follower");
         _;
@@ -243,5 +245,64 @@ contract TribeCopyVault is ReentrancyGuard, Ownable {
     function calculatePnL(address token) external view returns (int256) {
         uint256 currentValue = IERC20(token).balanceOf(address(this));
         return int256(currentValue) - int256(depositedCapital);
+    }
+
+    /**
+     * @notice Mint a real Uniswap V3 position using vault funds and record it
+     * @dev Called by Terminal; vault transfers tokens to adapter and receives NFT
+     */
+    function mirrorMintUniswapV3(
+        address adapter,
+        address positionManager,
+        address token0,
+        address token1,
+        uint24 fee,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 amount0,
+        uint256 amount1
+    ) external onlyTerminal nonReentrant returns (uint256 positionId, uint256 tokenId, uint128 liquidity) {
+        require(!emergencyMode, "Emergency mode active");
+        require(amount0 > 0 && amount1 > 0, "Amounts must be > 0");
+
+        // Move tokens to adapter for minting
+        IERC20(token0).safeTransfer(adapter, amount0);
+        IERC20(token1).safeTransfer(adapter, amount1);
+
+        // Mint position to this vault and refund unused tokens back to this vault
+        bytes memory data = abi.encodeWithSignature(
+            "mintPositionWithRefund(address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,address)",
+            token0,
+            token1,
+            fee,
+            tickLower,
+            tickUpper,
+            amount0,
+            amount1,
+            0,
+            0,
+            address(this),
+            address(this)
+        );
+        (bool ok, bytes memory ret) = adapter.call(data);
+        require(ok, "Mint failed");
+        (tokenId, liquidity,,) = abi.decode(ret, (uint256, uint128, uint256, uint256));
+
+        // Record position
+        positionId = positions.length;
+        positions.push(
+            Position({
+                protocol: positionManager,
+                token0: token0,
+                token1: token1,
+                liquidity: liquidity,
+                tokenId: tokenId,
+                isActive: true
+            })
+        );
+        activePositions[positionId] = true;
+        lastActivityTime = block.timestamp;
+        emit PositionMirrored(positionManager, token0, token1, liquidity);
+        emit PositionMinted(positionId, tokenId, liquidity);
     }
 }

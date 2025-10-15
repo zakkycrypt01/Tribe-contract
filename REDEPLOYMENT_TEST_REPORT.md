@@ -204,16 +204,51 @@ End-to-end integration test covering the complete copy-trading workflow:
 ## 📝 Key Findings
 
 ### ✅ What Works Perfectly
+### 🚨 CRITICAL FINDING: Follower NFT Ownership Issue
+
+**During testing, we discovered that follower vaults do NOT own real Uniswap V3 NFT positions.**
+
+**Current Behavior:**
+- ✅ Leader gets real Uniswap V3 NFT position (e.g., NFT #71032)
+- ❌ Follower vaults only **record** position metadata (no actual NFT ownership)
+- ❌ Follower vault NFT balance: **0**
+
+**Verification:**
+```bash
+forge script script/VerifyFollowerNFTs.s.sol --rpc-url base_sepolia
+
+Output:
+   Leader NFT Balance: 3 (owns #71018, #71031, #71032)
+   Follower Vault NFT Balance: 0  ❌
+   Vault Position Records: 1 (metadata only)
+```
+
+**Impact:**
+- ❌ Followers cannot collect trading fees from Uniswap pool
+- ❌ Followers cannot independently manage positions
+- ❌ Positions are not truly "mirrored" - just recorded
+- ❌ Followers don't participate in actual DeFi positions
+
+**Required Fix:**
+Each follower vault must mint its own proportional Uniswap V3 position (NFT) when leader adds liquidity.
+
+See detailed implementation plan: **`FOLLOWER_NFT_IMPLEMENTATION.md`**
+
+---
+
+### ✅ What Works Perfectly
+
 
 1. **Real Uniswap Integration**
-   - LeaderTerminal creates actual Uniswap V3 positions (not just records)
+   - LeaderTerminal creates actual Uniswap V3 positions for LEADERS (not just records)
    - Positions are verifiable on-chain as ERC-721 NFTs
-   - Liquidity earns real trading fees from Uniswap pool
+   - Leader's liquidity earns real trading fees from Uniswap pool
 
 2. **Automatic Mirroring**
-   - Follower vaults automatically receive mirrored positions
+   - Follower vaults automatically RECORD position metadata
    - Proportional calculation based on vault capital
-   - Position tracking with correct parameters
+   - Position tracking with correct parameters  
+   - ❌ **But vaults don't own actual NFTs** (see Critical Finding above)
 
 3. **Leader Registration**
    - 80% profitability gate enforced

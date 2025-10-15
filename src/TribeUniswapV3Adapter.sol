@@ -135,6 +135,53 @@ contract TribeUniswapV3Adapter {
     }
 
     /**
+     * @notice Mint a new Uniswap V3 position and refund unused tokens to a recipient
+     */
+    function mintPositionWithRefund(
+        address token0,
+        address token1,
+        uint24 fee,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 amount0Desired,
+        uint256 amount1Desired,
+        uint256 amount0Min,
+        uint256 amount1Min,
+        address recipient,
+        address refundTo
+    ) external returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
+        // Approve tokens
+        IERC20(token0).approve(address(POSITION_MANAGER), amount0Desired);
+        IERC20(token1).approve(address(POSITION_MANAGER), amount1Desired);
+
+        INonfungiblePositionManager.MintParams memory params = INonfungiblePositionManager.MintParams({
+            token0: token0,
+            token1: token1,
+            fee: fee,
+            tickLower: tickLower,
+            tickUpper: tickUpper,
+            amount0Desired: amount0Desired,
+            amount1Desired: amount1Desired,
+            amount0Min: amount0Min,
+            amount1Min: amount1Min,
+            recipient: recipient,
+            deadline: block.timestamp
+        });
+
+        (tokenId, liquidity, amount0, amount1) = POSITION_MANAGER.mint(params);
+
+        // Refund any unused tokens from adapter back to refundTo
+        if (amount0Desired > amount0) {
+            uint256 refund0 = amount0Desired - amount0;
+            IERC20(token0).safeTransfer(refundTo, refund0);
+        }
+        if (amount1Desired > amount1) {
+            uint256 refund1 = amount1Desired - amount1;
+            IERC20(token1).safeTransfer(refundTo, refund1);
+        }
+    }
+
+    /**
      * @notice Increase liquidity in an existing position
      */
     function increaseLiquidity(
