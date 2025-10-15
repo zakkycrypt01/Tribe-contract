@@ -6,6 +6,16 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+// Minimal interface for Uniswap V3 Position Manager approvals
+interface IPositionManagerMinimal {
+    function setApprovalForAll(address operator, bool approved) external;
+}
+
+interface IPositionManagerExtended is IPositionManagerMinimal {
+    function approve(address to, uint256 tokenId) external;
+    function isApprovedForAll(address owner, address operator) external view returns (bool);
+}
+
 /**
  * @title TribeCopyVault
  * @notice Individual vault that holds follower assets and mirrors leader actions
@@ -304,5 +314,88 @@ contract TribeCopyVault is ReentrancyGuard, Ownable {
         lastActivityTime = block.timestamp;
         emit PositionMirrored(positionManager, token0, token1, liquidity);
         emit PositionMinted(positionId, tokenId, liquidity);
+    }
+
+    /**
+     * @notice Close a Uniswap V3 position owned by this vault and redeem funds
+     * @dev Identifies position by token pair; approves adapter, removes all liquidity, collects, and burns NFT
+     * @param adapter Uniswap V3 adapter address
+     * @param positionManager Uniswap V3 Position Manager address
+     * @param token0 First token (must match recorded order)
+     * @param token1 Second token (must match recorded order)
+     * @param amount0Min Minimum amount0 to receive (slippage control)
+     * @param amount1Min Minimum amount1 to receive (slippage control)
+     */
+    function closeUniswapV3PositionByPair(
+        address adapter,
+        address positionManager,
+        address token0,
+        address token1,
+        uint256 amount0Min,
+        uint256 amount1Min
+    ) external onlyTerminal nonReentrant {
+        require(!emergencyMode, "Emergency mode active");
+
+        // Find latest active position matching pair and protocol with an NFT tokenId
+        uint256 positionId = type(uint256).max;
+        for (uint256 i = positions.length; i > 0; i--) {
+            Position memory p = positions[i - 1];
+            if (
+                p.isActive && p.protocol == positionManager && p.tokenId != 0 && p.token0 == token0
+                    && p.token1 == token1
+            ) {
+                positionId = i - 1;
+                break;
+            }
+        }
+        require(positionId != type(uint256).max, "No matching active position");
+
+        Position storage pos = positions[positionId];
+        uint256 tokenId = pos.tokenId;
+        uint128 liq = uint128(pos.liquidity);
+        require(liq > 0, "No liquidity");
+
+        // Approve adapter to operate the NFT (both global and per-token for compatibility)
+        IPositionManagerExtended pm = IPositionManagerExtended(positionManager);
+        pm.setApprovalForAll(adapter, true);
+        pm.approve(adapter, tokenId);
+
+        // Remove all liquidity and collect to this vault
+        (uint256 amt0, uint256 amt1) = _decreaseAndCollect(adapter, tokenId, liq, amount0Min, amount1Min);
+        (amt0); // silence unused warning if not used downstream
+        (amt1);
+
+        // Burn the NFT
+        (bool okBurn,) = adapter.call(abi.encodeWithSignature("burnPosition(uint256)", tokenId));
+        require(okBurn, "Burn failed");
+
+        // Update state
+        pos.liquidity = 0;
+        pos.isActive = false;
+        activePositions[positionId] = false;
+        lastActivityTime = block.timestamp;
+
+        emit PositionClosed(positionId);
+    }
+
+    function _decreaseAndCollect(
+        address adapter,
+        uint256 tokenId,
+        uint128 liquidity,
+        uint256 amount0Min,
+        uint256 amount1Min
+    ) internal returns (uint256 amount0, uint256 amount1) {
+        // Decrease
+        (bool okDec, bytes memory retDec) = adapter.call(
+            abi.encodeWithSignature(
+                "decreaseLiquidity(uint256,uint128,uint256,uint256)", tokenId, liquidity, amount0Min, amount1Min
+            )
+        );
+        require(okDec, "Decrease failed");
+        (amount0, amount1) = abi.decode(retDec, (uint256, uint256));
+
+        // Collect all to this vault
+        (bool okCol,) = adapter.call(abi.encodeWithSignature("collectFees(uint256,address)", tokenId, address(this)));
+        require(okCol, "Collect failed");
     }
 }
