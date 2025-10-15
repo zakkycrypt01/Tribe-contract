@@ -19,6 +19,10 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          # Pin to a stable Foundry release to ensure consistent formatting between local and CI
+          version: stable
+          cache: true
 
       - name: Show Forge version
         run: |
