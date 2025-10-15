@@ -6,8 +6,9 @@ import {TribeVaultFactory} from "../src/TribeVaultFactory.sol";
 import {TribeLeaderRegistry} from "../src/TribeLeaderRegistry.sol";
 
 contract TestVaultFactory is Script {
-    address constant VAULT_FACTORY = 0x54e6Cb2C7da3BB683f0653D804969609711B2740;
-    address constant LEADER_REGISTRY = 0xB28049beA41b96B54a8dA0Ee47C8F7209e820150;
+    // Set via environment: export VAULT_FACTORY=0x..., LEADER_REGISTRY=0x...
+    address immutable VAULT_FACTORY = vm.envAddress("VAULT_FACTORY");
+    address immutable LEADER_REGISTRY = vm.envAddress("LEADER_REGISTRY");
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");

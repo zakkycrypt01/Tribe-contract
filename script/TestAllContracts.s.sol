@@ -10,19 +10,23 @@ import "../src/TribeLeaderboard.sol";
 import "../src/TribePerformanceTracker.sol";
 import "../src/TribeUniswapV3Adapter.sol";
 import "../src/TribeCopyVault.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title TestAllContracts
  * @notice Comprehensive test of all Tribe protocol contract interfaces
  */
 contract TestAllContracts is Script {
-    // Contract addresses on Base Sepolia
-    address constant LEADER_REGISTRY = 0xB28049beA41b96B54a8dA0Ee47C8F7209e820150;
-    address constant VAULT_FACTORY = 0x54e6Cb2C7da3BB683f0653D804969609711B2740;
-    address constant LEADER_TERMINAL = 0xE4E9D97664f1c74aEe1E6A83866E9749D32e02CE;
-    address constant LEADERBOARD = 0xe27070fd257607aB185B83652C139aE38f997cbE;
-    address constant PERFORMANCE_TRACKER = 0xdFbefEcD6A35078c409fd907E0FA03a33015A48e;
-    address constant UNISWAP_V3_ADAPTER = 0x36888e432d41729B0978F89e71F1e523147E7CcC;
+    // Contract addresses on Base Sepolia - set via env after deployment
+    address immutable LEADER_REGISTRY = vm.envAddress("LEADER_REGISTRY");
+    address immutable VAULT_FACTORY = vm.envAddress("VAULT_FACTORY");
+    address immutable LEADER_TERMINAL = vm.envAddress("LEADER_TERMINAL");
+    address immutable LEADERBOARD = vm.envAddress("LEADERBOARD");
+    address immutable PERFORMANCE_TRACKER = vm.envAddress("PERFORMANCE_TRACKER");
+    address immutable UNISWAP_V3_ADAPTER = vm.envAddress("UNISWAP_V3_ADAPTER");
+
+    // Protocol addresses
+    address constant UNISWAP_V3_POSITION_MANAGER = 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2;
 
     // Test tokens on Base Sepolia
     address constant USDC = 0x036CbD53842c5426634e7929541eC2318f3dCF7e;
@@ -58,6 +62,9 @@ contract TestAllContracts is Script {
 
         // Test 6: Uniswap V3 Adapter
         testUniswapV3Adapter();
+
+        // Test 7: Real Uniswap Position Creation
+        testRealUniswapPosition();
 
         vm.stopBroadcast();
 
@@ -297,6 +304,105 @@ contract TestAllContracts is Script {
         );
         console.log("Proportional Amount0:", amount0);
         console.log("Proportional Amount1:", amount1);
+
+        console.log("");
+    }
+
+    function testRealUniswapPosition() internal {
+        console.log("--- Testing Real Uniswap V3 Position Creation ---");
+
+        uint24 FEE = 3000; // 0.3%
+        int24 TICK_LOWER = -887220; // Full range
+        int24 TICK_UPPER = 887220; // Full range
+        uint256 AMOUNT_USDC = 3e6; // 3 USDC
+        uint256 AMOUNT_WETH = 0.001 ether; // 0.001 WETH
+
+        // Check balances
+        uint256 usdcBalance = IERC20(USDC).balanceOf(testLeader);
+        uint256 wethBalance = IERC20(WETH).balanceOf(testLeader);
+        console.log("USDC Balance:", usdcBalance);
+        console.log("WETH Balance:", wethBalance);
+
+        if (usdcBalance < AMOUNT_USDC || wethBalance < AMOUNT_WETH) {
+            console.log("Insufficient balance for real position test. Skipping...");
+            console.log("");
+            return;
+        }
+
+        // Determine token order (token0 < token1)
+        address token0 = USDC < WETH ? USDC : WETH;
+        address token1 = USDC < WETH ? WETH : USDC;
+        uint256 amount0Desired = token0 == USDC ? AMOUNT_USDC : AMOUNT_WETH;
+        uint256 amount1Desired = token1 == USDC ? AMOUNT_USDC : AMOUNT_WETH;
+
+        console.log("");
+        console.log("Token0:", token0);
+        console.log("Token1:", token1);
+        console.log("Amount0:", amount0Desired);
+        console.log("Amount1:", amount1Desired);
+
+        // Approve Uniswap Position Manager
+        IERC20(token0).approve(UNISWAP_V3_POSITION_MANAGER, amount0Desired);
+        IERC20(token1).approve(UNISWAP_V3_POSITION_MANAGER, amount1Desired);
+        console.log("");
+        console.log("Approved tokens");
+
+        // Mint position
+        INonfungiblePositionManager.MintParams memory params = INonfungiblePositionManager.MintParams({
+            token0: token0,
+            token1: token1,
+            fee: FEE,
+            tickLower: TICK_LOWER,
+            tickUpper: TICK_UPPER,
+            amount0Desired: amount0Desired,
+            amount1Desired: amount1Desired,
+            amount0Min: 0,
+            amount1Min: 0,
+            recipient: testLeader,
+            deadline: block.timestamp + 300
+        });
+
+        (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) =
+            INonfungiblePositionManager(UNISWAP_V3_POSITION_MANAGER).mint(params);
+
+        console.log("");
+        console.log("=== POSITION CREATED ===");
+        console.log("Token ID:", tokenId);
+        console.log("Liquidity:", liquidity);
+        console.log("Amount0 Used:", amount0);
+        console.log("Amount1 Used:", amount1);
+
+        // Query the position
+        (
+            ,
+            ,
+            address posToken0,
+            address posToken1,
+            uint24 posFee,
+            int24 posTickLower,
+            int24 posTickUpper,
+            uint128 posLiquidity,
+            ,
+            ,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        ) = INonfungiblePositionManager(UNISWAP_V3_POSITION_MANAGER).positions(tokenId);
+
+        console.log("");
+        console.log("=== POSITION DETAILS ===");
+        console.log("Token0:", posToken0);
+        console.log("Token1:", posToken1);
+        console.log("Fee Tier:", posFee);
+        console.log("Tick Lower:", uint256(int256(posTickLower)));
+        console.log("Tick Upper:", uint256(int256(posTickUpper)));
+        console.log("Liquidity:", posLiquidity);
+        console.log("Tokens Owed0:", tokensOwed0);
+        console.log("Tokens Owed1:", tokensOwed1);
+
+        console.log("");
+        console.log("SUCCESS: Real Uniswap V3 position created on-chain!");
+        console.log("View on BaseScan:");
+        console.log("https://sepolia.basescan.org/nft/", UNISWAP_V3_POSITION_MANAGER, "/", tokenId);
 
         console.log("");
     }

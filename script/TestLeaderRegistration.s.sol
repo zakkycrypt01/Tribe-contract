@@ -5,7 +5,8 @@ import {Script, console} from "forge-std/Script.sol";
 import {TribeLeaderRegistry} from "../src/TribeLeaderRegistry.sol";
 
 contract TestLeaderRegistration is Script {
-    address constant LEADER_REGISTRY = 0xB28049beA41b96B54a8dA0Ee47C8F7209e820150;
+    // Set via environment: export LEADER_REGISTRY=0x...
+    address immutable LEADER_REGISTRY = vm.envAddress("LEADER_REGISTRY");
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");

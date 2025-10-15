@@ -7,9 +7,10 @@ import {TribeVaultFactory} from "../src/TribeVaultFactory.sol";
 import {TribeLeaderRegistry} from "../src/TribeLeaderRegistry.sol";
 
 contract TestLeaderTerminal is Script {
-    address constant LEADER_TERMINAL = 0xE4E9D97664f1c74aEe1E6A83866E9749D32e02CE;
-    address constant VAULT_FACTORY = 0x54e6Cb2C7da3BB683f0653D804969609711B2740;
-    address constant LEADER_REGISTRY = 0xB28049beA41b96B54a8dA0Ee47C8F7209e820150;
+    // Set via environment: export LEADER_TERMINAL=0x..., VAULT_FACTORY=0x..., LEADER_REGISTRY=0x...
+    address immutable LEADER_TERMINAL = vm.envAddress("LEADER_TERMINAL");
+    address immutable VAULT_FACTORY = vm.envAddress("VAULT_FACTORY");
+    address immutable LEADER_REGISTRY = vm.envAddress("LEADER_REGISTRY");
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");

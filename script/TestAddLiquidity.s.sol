@@ -6,7 +6,8 @@ import {TribeLeaderTerminal} from "../src/TribeLeaderTerminal.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract TestAddLiquidity is Script {
-    address constant LEADER_TERMINAL = 0xE4E9D97664f1c74aEe1E6A83866E9749D32e02CE;
+    // Set via environment: export LEADER_TERMINAL=0x...
+    address immutable LEADER_TERMINAL = vm.envAddress("LEADER_TERMINAL");
     // Base Sepolia token addresses
     address constant WETH = 0x4200000000000000000000000000000000000006; // WETH on Base Sepolia
     address constant USDC = 0x036CbD53842c5426634e7929541eC2318f3dCF7e; // USDC on Base Sepolia

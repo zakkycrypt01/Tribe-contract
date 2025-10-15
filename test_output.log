@@ -1,0 +1,136 @@
+No files changed, compilation skipped
+Script ran successfully.
+
+== Logs ==
+  === COMPREHENSIVE CONTRACT INTERFACE TEST ===
+  Test Leader Address: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  
+  --- Testing TribeLeaderRegistry ---
+  Is Leader Registered: true
+  Strategy Name: Updated Strategy
+  Description: Updated description.
+  Is Active: true
+  Performance Fee (bps): 1000
+  Total Followers: 0
+  Total TVL: 0
+  Historical Positions Count: 5
+  Profitability Percentage: 100
+  Total Leaders in System: 1
+  
+  --- Testing TribeVaultFactory ---
+  Vault Address: 0xB4919d4C0F261B2258740A0b69c45b4413dC2500
+  Is Valid Vault: true
+  Vault Follower: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  Vault Leader: 0x73D43dd9Ac2C0Fd004286F7a13F51bec163efB2C
+  Vault Terminal: 0x5737e1Be8CA566E0c903a973991E0FF6b027281F
+  Performance Fee %: 1000
+  Deposited Capital: 0
+  High Water Mark: 0
+  Emergency Mode: false
+  USDC Balance: 0
+  WETH Balance: 0
+  Active Positions: 0
+  Leader's Follower Vaults Count: 1
+  Leader Follower Count: 1
+  Total Vaults in System: 1
+  Leader TVL (USDC): 0
+  
+  --- Testing TribeLeaderTerminal ---
+  Uniswap V3 Position Manager: 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2
+  Aerodrome Router: 0x0000000000000000000000000000000000000000
+  Total Leader Actions: 0
+  
+  --- Testing TribeLeaderboard ---
+  Profile - Strategy Name: Updated Strategy
+  Profile - Net APR (bps): 0
+  Profile - Total Fees Earned: 0
+  Profile - Total TVL: 0
+  Profile - Risk Score: 0
+  Profile - Max Drawdown: 0
+  Profile - Total Followers: 0
+  Profile - Performance Fee %: 1000
+  Profile - Is Active: true
+  Profile - Registration Time: 1760558734
+  Total Leader Profiles: 1
+  Top Leaders by APR: 1
+  Top Leaders by TVL: 1
+  Low Risk Leaders: 1
+  Leaders with APR > 10%: 0
+  Risk-Adjusted Return: 0
+  Stats - Available via getLeaderProfile() above
+  
+  --- Testing TribePerformanceTracker ---
+  Metrics - Total Fees Earned: 0
+  Metrics - Net APR (bps): 0
+  Metrics - Total Volume: 0
+  Metrics - Max Drawdown: 0
+  Metrics - Risk Score: 0
+  Metrics - Last Updated: 0
+  Total Snapshots: 0
+  Calculated APR: 0
+  30-Day APR: 0
+  Max Drawdown: 0
+  Risk Score: 50
+  
+  --- Testing TribeUniswapV3Adapter ---
+  Position Manager: 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2
+  Proportional Amount0: 500000
+  Proportional Amount1: 200000
+  
+  --- Testing Real Uniswap V3 Position Creation ---
+  USDC Balance: 4400047
+  WETH Balance: 8000000000004996
+  
+  Token0: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+  Token1: 0x4200000000000000000000000000000000000006
+  Amount0: 3000000
+  Amount1: 1000000000000000
+  
+  Approved tokens
+  
+  === POSITION CREATED ===
+  Token ID: 71031
+  Liquidity: 50989727344
+  Amount0 Used: 2599953
+  Amount1 Used: 999999999995004
+  
+  === POSITION DETAILS ===
+  Token0: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+  Token1: 0x4200000000000000000000000000000000000006
+  Fee Tier: 3000
+  Tick Lower: 115792089237316195423570985008687907853269984665640564039457584007913128752716
+  Tick Upper: 887220
+  Liquidity: 50989727344
+  Tokens Owed0: 0
+  Tokens Owed1: 0
+  
+  SUCCESS: Real Uniswap V3 position created on-chain!
+  View on BaseScan:
+  https://sepolia.basescan.org/nft/ 0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2 / 71031
+  
+  
+  === ALL TESTS COMPLETED ===
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 84532
+
+Estimated gas price: 0.001000244 gwei
+
+Estimated total gas used for script: 624771
+
+Estimated amount required: 0.000000624923444124 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/zakky/Downloads/Tribe/broadcast/TestAllContracts.s.sol/84532/run-latest.json
+
+Sensitive values saved to: /home/zakky/Downloads/Tribe/cache/TestAllContracts.s.sol/84532/run-latest.json
+
