@@ -42,15 +42,7 @@ contract TestAddLiquidity is Script {
 
         // Call addLiquidityUniswapV3
         try TribeLeaderTerminal(LEADER_TERMINAL).addLiquidityUniswapV3(
-            token0,
-            token1,
-            FEE,
-            TICK_LOWER,
-            TICK_UPPER,
-            amount0Desired,
-            amount1Desired,
-            AMOUNT0_MIN,
-            AMOUNT1_MIN
+            token0, token1, FEE, TICK_LOWER, TICK_UPPER, amount0Desired, amount1Desired, AMOUNT0_MIN, AMOUNT1_MIN
         ) returns (uint256 tokenId, uint128 liquidity) {
             console.log("Liquidity position created. TokenId:", tokenId, "Liquidity:", liquidity);
         } catch {

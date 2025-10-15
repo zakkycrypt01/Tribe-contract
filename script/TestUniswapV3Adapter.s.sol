@@ -12,8 +12,8 @@ contract TestUniswapV3Adapter is Script {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
 
         // Check position manager address
-    address pm = address(TribeUniswapV3Adapter(UNISWAP_V3_ADAPTER).POSITION_MANAGER());
-    console.log("UniswapV3 Position Manager:", pm);
+        address pm = address(TribeUniswapV3Adapter(UNISWAP_V3_ADAPTER).POSITION_MANAGER());
+        console.log("UniswapV3 Position Manager:", pm);
 
         vm.stopBroadcast();
     }

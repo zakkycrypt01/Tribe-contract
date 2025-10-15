@@ -12,7 +12,6 @@ contract TestLeaderRegistration is Script {
         address leader = vm.addr(pk);
         vm.startBroadcast(pk);
 
-
         // Only register if not already registered
         bool isRegistered = TribeLeaderRegistry(LEADER_REGISTRY).isRegisteredLeader(leader);
         if (!isRegistered) {
@@ -45,10 +44,7 @@ contract TestLeaderRegistration is Script {
         }
 
         // Update strategy
-        TribeLeaderRegistry(LEADER_REGISTRY).updateStrategy(
-            "Updated Strategy",
-            "Updated description."
-        );
+        TribeLeaderRegistry(LEADER_REGISTRY).updateStrategy("Updated Strategy", "Updated description.");
         console.log("Strategy updated.");
 
         // Deactivate leader (must be owner, so skip if not owner)

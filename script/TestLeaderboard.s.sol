@@ -18,9 +18,7 @@ contract TestLeaderboard is Script {
         // For each leader, get profile
         for (uint256 i = 0; i < allLeaders.length; i++) {
             // This will revert if not registered, so wrap in try/catch
-            try leaderboard.getLeaderProfile(allLeaders[i]) returns (
-                TribeLeaderboard.LeaderProfile memory profile
-            ) {
+            try leaderboard.getLeaderProfile(allLeaders[i]) returns (TribeLeaderboard.LeaderProfile memory profile) {
                 console.log("Leader:", profile.wallet);
                 console.log("Strategy:", profile.strategyName);
                 console.log("APR:", profile.netApr);

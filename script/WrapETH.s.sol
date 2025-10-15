@@ -19,9 +19,9 @@ contract WrapETH is Script {
         // Wrap 0.01 ETH to WETH
         uint256 amountToWrap = 0.01 ether;
         console.log("Wrapping", amountToWrap, "ETH to WETH");
-        
+
         IWETH(WETH).deposit{value: amountToWrap}();
-        
+
         uint256 wethBalance = IWETH(WETH).balanceOf(user);
         console.log("WETH balance after wrapping:", wethBalance);
 
