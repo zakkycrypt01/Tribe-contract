@@ -81,15 +81,18 @@ contract TribeCopyVault is ReentrancyGuard, Ownable {
         require(amount > 0, "Amount must be > 0");
         require(!emergencyMode, "Emergency mode active");
 
+        // Pull funds from follower into the vault
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
-        require(msg.sender == FOLLOWER, "Only follower");
 
+        // Update accounting
+        depositedCapital += amount;
         if (highWaterMark == 0) {
+            // Initialize HWM to current deposited capital on first deposit
             highWaterMark = depositedCapital;
         }
 
         lastActivityTime = block.timestamp;
-        require(msg.sender == TERMINAL, "Only terminal");
+        emit Deposited(msg.sender, amount);
     }
 
     /**
