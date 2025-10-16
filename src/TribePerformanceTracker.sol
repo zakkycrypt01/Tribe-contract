@@ -48,6 +48,7 @@ contract TribePerformanceTracker is Ownable {
     // Constants
     uint256 public constant SECONDS_PER_YEAR = 365 days;
     uint256 public constant BASIS_POINTS = 10000;
+    uint256 public constant PRICE_FEED_STALENESS_THRESHOLD = 3600; // 1 hour
 
     // Events
     event PriceFeedUpdated(address indexed token, address indexed priceFeed);
@@ -74,15 +75,25 @@ contract TribePerformanceTracker is Ownable {
     }
 
     /**
-     * @notice Get USD price for a token using Chainlink
+     * @notice Get USD price for a token using Chainlink with staleness and validation checks
+     * @dev Validates round completion, price validity, and timestamp freshness
      */
     function getTokenPriceUsd(address token) public view returns (uint256) {
         address priceFeed = priceFeeds[token];
         require(priceFeed != address(0), "Price feed not set");
 
         AggregatorV3Interface feed = AggregatorV3Interface(priceFeed);
-        (, int256 price,,,) = feed.latestRoundData();
+        (uint80 roundId, int256 price,, uint256 updatedAt, uint80 answeredInRound) = feed.latestRoundData();
+
+        // Validate round completion
+        require(answeredInRound >= roundId, "Stale price data");
+
+        // Validate price is positive
         require(price > 0, "Invalid price");
+
+        // Validate timestamp freshness (data not older than threshold)
+        require(updatedAt > 0, "Invalid timestamp");
+        require(block.timestamp - updatedAt <= PRICE_FEED_STALENESS_THRESHOLD, "Price data too old");
 
         uint8 decimals = feed.decimals();
 

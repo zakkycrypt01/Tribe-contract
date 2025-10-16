@@ -45,6 +45,9 @@ contract TribeLeaderRegistry is Ownable, ReentrancyGuard {
     // Array of all leader addresses
     address[] public allLeaders;
 
+    // Authorized contracts that can update metrics
+    mapping(address => bool) public authorizedUpdaters;
+
     // Constants
     uint256 public constant MIN_PROFITABILITY_PERCENT = 80; // 80%
     uint256 public constant MIN_HISTORICAL_POSITIONS = 5; // Minimum positions to qualify
@@ -56,8 +59,29 @@ contract TribeLeaderRegistry is Ownable, ReentrancyGuard {
     event LeaderReactivated(address indexed leader);
     event StrategyUpdated(address indexed leader, string newName, string newDescription);
     event HistoricalPositionAdded(address indexed leader, bool isProfitable);
+    event AuthorizedUpdaterAdded(address indexed updater);
+    event AuthorizedUpdaterRemoved(address indexed updater);
 
     constructor() Ownable(msg.sender) {}
+
+    /**
+     * @notice Add an authorized contract that can update leader metrics
+     * @param updater Address to authorize (VaultFactory or Terminal)
+     */
+    function addAuthorizedUpdater(address updater) external onlyOwner {
+        require(updater != address(0), "Invalid address");
+        authorizedUpdaters[updater] = true;
+        emit AuthorizedUpdaterAdded(updater);
+    }
+
+    /**
+     * @notice Remove an authorized updater
+     * @param updater Address to remove authorization from
+     */
+    function removeAuthorizedUpdater(address updater) external onlyOwner {
+        authorizedUpdaters[updater] = false;
+        emit AuthorizedUpdaterRemoved(updater);
+    }
 
     /**
      * @notice Submit historical LP positions for qualification
@@ -150,10 +174,11 @@ contract TribeLeaderRegistry is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Update follower count and TVL (called by vault factory)
+     * @notice Update follower count and TVL (called by authorized contracts only)
+     * @dev Only VaultFactory, Terminal, or other authorized contracts can call this
      */
     function updateLeaderMetrics(address leader, uint256 followerCount, uint256 tvl) external {
-        // In production, restrict this to authorized contracts only
+        require(authorizedUpdaters[msg.sender], "Not authorized to update metrics");
         require(isRegisteredLeader[leader], "Not a registered leader");
         leaders[leader].totalFollowers = followerCount;
         leaders[leader].totalTvl = tvl;

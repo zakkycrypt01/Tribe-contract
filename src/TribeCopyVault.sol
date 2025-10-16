@@ -116,11 +116,19 @@ contract TribeCopyVault is ReentrancyGuard, Ownable {
         uint256 vaultBalance = IERC20(token).balanceOf(address(this));
         require(vaultBalance >= amount, "Insufficient balance");
 
-        // Calculate performance fee if above high water mark
+        // Calculate performance fee only on realized profit proportional to withdrawal
         uint256 performanceFee = 0;
         if (vaultBalance > highWaterMark) {
-            uint256 profit = vaultBalance - highWaterMark;
-            performanceFee = (profit * performanceFeePercent) / 10000;
+            uint256 totalProfit = vaultBalance - highWaterMark;
+
+            // Calculate realized profit share proportional to withdrawal amount
+            uint256 realizedProfit = (totalProfit * amount) / vaultBalance;
+
+            // Calculate performance fee on realized profit only
+            performanceFee = (realizedProfit * performanceFeePercent) / 10000;
+
+            // Ensure fee never exceeds withdrawal amount
+            require(performanceFee <= amount, "Fee calculation error");
 
             // Transfer fee to leader
             if (performanceFee > 0) {
@@ -128,11 +136,13 @@ contract TribeCopyVault is ReentrancyGuard, Ownable {
                 emit PerformanceFeeCollected(LEADER, performanceFee);
             }
 
-            // Update high water mark
-            highWaterMark = vaultBalance - performanceFee;
+            // Update high water mark proportionally
+            // Reduce HWM by the amount withdrawn (excluding fees)
+            uint256 withdrawnCapital = amount - performanceFee;
+            highWaterMark = highWaterMark > withdrawnCapital ? highWaterMark - withdrawnCapital : vaultBalance - amount;
         }
 
-        // Transfer to follower
+        // Transfer to follower (amount minus performance fee)
         uint256 followerAmount = amount - performanceFee;
         IERC20(token).safeTransfer(FOLLOWER, followerAmount);
 

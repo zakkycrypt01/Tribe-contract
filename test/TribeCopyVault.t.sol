@@ -76,15 +76,21 @@ contract TribeCopyVaultTest is Test {
         // Simulate profit: mint tokens to vault so balance > HWM
         token.mint(address(vault), 2 ether); // vault balance now 12
 
-        // Withdraw 6 (half). Profit is 2, fee = 10% = 0.2, HWM becomes 12 - 0.2 = 11.8
+        // Withdraw 6.
+        // CORRECTED CALCULATION (per audit fix):
+        // vaultBalance = 12, HWM = 10, totalProfit = 2
+        // realizedProfit = (totalProfit * amount) / vaultBalance = (2 * 6) / 12 = 1
+        // performanceFee = realizedProfit * 1000 / 10000 = 1 * 0.1 = 0.1
+        // followerAmount = 6 - 0.1 = 5.9
         vm.prank(follower);
         vault.withdraw(address(token), 6 ether);
 
-        // Follower should receive amount minus fee share only applied on profits, not on principal sent out.
-        // In our implementation, fee is taken from vault when above HWM, then followerAmount = amount - performanceFee.
-        // With vaultBalance=12, profit=2, fee=0.2; followerAmount=6-0.2=5.8
-        assertEq(token.balanceOf(follower), 100 ether - 10 ether + 5.8 ether, "follower received");
-        assertEq(token.balanceOf(leader), 0.2 ether, "leader fee received");
-        assertEq(vault.highWaterMark(), 11.8 ether, "HWM updated");
+        // Follower should receive withdrawal amount minus proportional performance fee
+        // followerAmount = 6 - 0.1 = 5.9
+        assertEq(token.balanceOf(follower), 100 ether - 10 ether + 5.9 ether, "follower received");
+        assertEq(token.balanceOf(leader), 0.1 ether, "leader fee received");
+        // HWM is reduced by withdrawnCapital = amount - performanceFee = 5.9
+        // newHWM = 10 - 5.9 = 4.1
+        assertEq(vault.highWaterMark(), 4.1 ether, "HWM updated");
     }
 }

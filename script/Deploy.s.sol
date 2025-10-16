@@ -51,6 +51,11 @@ contract Deploy is Script {
         vaultFactory.setTerminal(address(leaderTerminal));
         console.log("Terminal address set in VaultFactory");
 
+        // 4.5. Authorize VaultFactory to update leader metrics
+        console.log("\n4.5. Authorizing VaultFactory to update leader metrics...");
+        leaderRegistry.addAuthorizedUpdater(address(vaultFactory));
+        console.log("VaultFactory authorized in LeaderRegistry");
+
         // 5. Deploy TribePerformanceTracker
         console.log("\n5. Deploying TribePerformanceTracker...");
         TribePerformanceTracker performanceTracker =

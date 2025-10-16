@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title TribeUniswapV3Adapter
@@ -86,14 +87,17 @@ interface INonfungiblePositionManager {
         );
 }
 
-contract TribeUniswapV3Adapter {
+contract TribeUniswapV3Adapter is Ownable {
     using SafeERC20 for IERC20;
 
     // Uniswap V3 interfaces
 
     INonfungiblePositionManager public immutable POSITION_MANAGER;
 
-    constructor(address _positionManager) {
+    // Events
+    event TokensSwept(address indexed token, address indexed to, uint256 amount);
+
+    constructor(address _positionManager) Ownable(msg.sender) {
         require(_positionManager != address(0), "Invalid position manager");
         POSITION_MANAGER = INonfungiblePositionManager(_positionManager);
     }
@@ -113,9 +117,9 @@ contract TribeUniswapV3Adapter {
         uint256 amount1Min,
         address recipient
     ) external returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
-        // Approve tokens
-        IERC20(token0).approve(address(POSITION_MANAGER), amount0Desired);
-        IERC20(token1).approve(address(POSITION_MANAGER), amount1Desired);
+        // Approve tokens using SafeERC20 - reset to zero first for compatibility
+        IERC20(token0).safeIncreaseAllowance(address(POSITION_MANAGER), amount0Desired);
+        IERC20(token1).safeIncreaseAllowance(address(POSITION_MANAGER), amount1Desired);
 
         INonfungiblePositionManager.MintParams memory params = INonfungiblePositionManager.MintParams({
             token0: token0,
@@ -150,9 +154,9 @@ contract TribeUniswapV3Adapter {
         address recipient,
         address refundTo
     ) external returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
-        // Approve tokens
-        IERC20(token0).approve(address(POSITION_MANAGER), amount0Desired);
-        IERC20(token1).approve(address(POSITION_MANAGER), amount1Desired);
+        // Approve tokens using SafeERC20
+        IERC20(token0).safeIncreaseAllowance(address(POSITION_MANAGER), amount0Desired);
+        IERC20(token1).safeIncreaseAllowance(address(POSITION_MANAGER), amount1Desired);
 
         INonfungiblePositionManager.MintParams memory params = INonfungiblePositionManager.MintParams({
             token0: token0,
@@ -194,8 +198,8 @@ contract TribeUniswapV3Adapter {
         // Get position details to approve correct tokens
         (,, address token0, address token1,,,,,,,,) = POSITION_MANAGER.positions(tokenId);
 
-        IERC20(token0).approve(address(POSITION_MANAGER), amount0Desired);
-        IERC20(token1).approve(address(POSITION_MANAGER), amount1Desired);
+        IERC20(token0).safeIncreaseAllowance(address(POSITION_MANAGER), amount0Desired);
+        IERC20(token1).safeIncreaseAllowance(address(POSITION_MANAGER), amount1Desired);
 
         INonfungiblePositionManager.IncreaseLiquidityParams memory params = INonfungiblePositionManager
             .IncreaseLiquidityParams({
@@ -285,5 +289,22 @@ contract TribeUniswapV3Adapter {
         proportionalAmount1 = (amount1 * vaultShare) / totalLiquidity;
 
         return (proportionalAmount0, proportionalAmount1);
+    }
+
+    /**
+     * @notice Sweep unused tokens from the adapter to recover stuck funds
+     * @dev Only owner can call this to prevent unauthorized token extraction
+     * @param token Address of the token to sweep
+     * @param to Address to send the swept tokens to
+     */
+    function sweep(address token, address to) external onlyOwner {
+        require(token != address(0), "Invalid token");
+        require(to != address(0), "Invalid recipient");
+
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        require(balance > 0, "No tokens to sweep");
+
+        IERC20(token).safeTransfer(to, balance);
+        emit TokensSwept(token, to, balance);
     }
 }
