@@ -1,7 +1,7 @@
-# Tribe Protocol Architecture
+# ARCHITECTURE
 
 ## Overview
-Tribe Protocol is a decentralized copy trading system that enables followers to automatically mirror the trading positions of successful leaders on decentralized exchanges like Uniswap V3 and Aerodrome.
+TribeProtocol is a modular, permissionless copy-trading stack designed for Base. It separates concerns into on-chain registries, factories, adapter-driven execution, and a performance accounting layer to enable trustless, proportional copying of on-chain liquidity and swaps.
 
 ## Core Components
 

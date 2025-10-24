@@ -132,7 +132,7 @@ TribeProtocol is a decentralized copy trading protocol built for Base, enabling 
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Architecture](./architecture.md)
+- [Architecture](./ARCHITECTURE.md)
 - [Test Results](./output.md)
 - [Contract Addresses](#contract-addresses)
 - [Tech Stack](#tech-stack)
