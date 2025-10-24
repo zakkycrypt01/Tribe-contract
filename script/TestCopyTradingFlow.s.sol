@@ -17,9 +17,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  */
 contract TestCopyTradingFlow is Script {
     // Contract addresses from deployment
-    address immutable LEADER_REGISTRY = vm.envAddress("LEADER_REGISTRY");
-    address immutable VAULT_FACTORY = vm.envAddress("VAULT_FACTORY");
-    address immutable LEADER_TERMINAL = vm.envAddress("LEADER_TERMINAL");
+    address constant LEADER_REGISTRY = 0xE73Eb839A848237E53988F0d74b069763aC38fE3;
+    address constant VAULT_FACTORY = 0xdEc456e502CB9baB4a33153206a470B65Bedcf9E;
+    address constant LEADER_TERMINAL = 0x5b9118131ff1F1c8f097828182E0560241CB9BA1;
 
     // Test tokens on Base Sepolia
     address constant USDC = 0x036CbD53842c5426634e7929541eC2318f3dCF7e;
@@ -62,8 +62,8 @@ contract TestCopyTradingFlow is Script {
 
         // Step 2: Deposit capital to follower vault
         console.log("--- Step 2: Deposit to Follower Vault ---");
-        uint256 depositAmountUSDC = 2; // deposit 2 raw USDC units to ensure vault has >0 USDC
-        uint256 depositAmountWETH = 0.00005 ether; // 0.00005 WETH (ultra-reduced)
+        uint256 depositAmountUSDC = 1000000; // deposit 1 USDC
+        uint256 depositAmountWETH = 10000000000; // 0.00001 WETH
 
         uint256 usdcBalance = IERC20(USDC).balanceOf(user);
         uint256 wethBalance = IERC20(WETH).balanceOf(user);
@@ -78,12 +78,16 @@ contract TestCopyTradingFlow is Script {
             console.log("Insufficient USDC for deposit");
         }
 
+        // Convert to same units for comparison
         if (wethBalance >= depositAmountWETH) {
             IERC20(WETH).approve(vaultAddress, depositAmountWETH);
             vault.deposit(WETH, depositAmountWETH);
-            console.log("Deposited WETH:", depositAmountWETH);
+            console.log("Deposited WETH:", uint256(depositAmountWETH));
+            console.log("WETH Balance After:", IERC20(WETH).balanceOf(user));
         } else {
             console.log("Insufficient WETH for deposit");
+            console.log("Required:", depositAmountWETH);
+            console.log("Available:", wethBalance);
         }
 
         uint256 vaultCapital = vault.depositedCapital();
@@ -110,8 +114,8 @@ contract TestCopyTradingFlow is Script {
         address token0 = USDC < WETH ? USDC : WETH;
         address token1 = USDC < WETH ? WETH : USDC;
 
-        uint256 leaderAmount0 = 40; // 0.00004 USDC (ultra-reduced)
-        uint256 leaderAmount1 = 0.00004 ether; // 0.00004 WETH (ultra-reduced)
+        uint256 leaderAmount0 = 500000; // 0.5 USDC
+        uint256 leaderAmount1 = 5000000000; // 0.000005 WETH
 
         // Check leader balances
         uint256 leaderUSDC = IERC20(USDC).balanceOf(user);
@@ -141,6 +145,18 @@ contract TestCopyTradingFlow is Script {
         bool needToken1 = amount1Desired > 0;
         bool hasToken0 = !needToken0 || IERC20(token0).balanceOf(user) >= amount0Desired;
         bool hasToken1 = !needToken1 || IERC20(token1).balanceOf(user) >= amount1Desired;
+        
+        console.log("");
+        console.log("=== Balance Check ===");
+        if (needToken0) {
+            console.log("Token0 Required:", amount0Desired);
+            console.log("Token0 Available:", IERC20(token0).balanceOf(user));
+        }
+        if (needToken1) {
+            console.log("Token1 Required:", amount1Desired);
+            console.log("Token1 Available:", IERC20(token1).balanceOf(user));
+        }
+        
         if (!(hasToken0 && hasToken1)) {
             console.log("ERROR: Insufficient balance for liquidity addition");
             vm.stopBroadcast();

@@ -1,0 +1,20 @@
+{
+  "name": "tribe-scripts",
+  "version": "1.0.0",
+  "description": "TypeScript scripts for Tribe protocol",
+  "scripts": {
+    "generate-types": "typechain --target ethers-v6 'abis/**/*.json'",
+    "deposit": "ts-node scripts/depositFunds.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "viem": "^1.21.4"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/node": "^20.8.9",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.3.1",
+    "typescript": "^5.2.2"
+  }
+}

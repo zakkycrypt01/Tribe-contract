@@ -14,8 +14,8 @@ contract TestAddLiquidity is Script {
     uint24 constant FEE = 3000; // 0.3% fee tier
     int24 constant TICK_LOWER = -887220; // Full range for safety
     int24 constant TICK_UPPER = 887220; // Full range for safety
-    uint256 constant AMOUNT_WETH_DESIRED = 0.001 ether; // 0.001 WETH
-    uint256 constant AMOUNT_USDC_DESIRED = 3e6; // 3 USDC (6 decimals)
+    uint256 constant AMOUNT_WETH_DESIRED = 0.0001 ether; // 0.0001 WETH
+    uint256 constant AMOUNT_USDC_DESIRED = 1e6; // 1 USDC (6 decimals)
     uint256 constant AMOUNT0_MIN = 0;
     uint256 constant AMOUNT1_MIN = 0;
 
