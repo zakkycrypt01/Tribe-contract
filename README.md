@@ -3,8 +3,8 @@
 ![Base](https://img.shields.io/badge/Base-Blockchain-blue)
 ![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.20-363636)
 ![License](https://img.shields.io/badge/License-MIT-green)
-[![Architecture](https://img.shields.io/badge/Architecture-Documented-brightgreen)](./ARCHITECTURE.md)
-[![Tests](https://img.shields.io/badge/Tests-Passing-success)](./TEST_RESULTS.md)
+[![Docs](https://img.shields.io/badge/Docs-Complete-brightgreen)](./DOCS.md)
+[![Security](https://img.shields.io/badge/Security-Verified-success)](./SECURITY.md)
 
 Key highlights:
 - Non-custodial vault-per-follower model
@@ -133,8 +133,8 @@ TribeProtocol is a decentralized copy trading protocol built for Base, enabling 
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Architecture](./ARCHITECTURE.md)
-- [Test Results](./TEST_RESULTS.md)
+- [Documentation](./DOCS.md)
+- [Security](./SECURITY.md)
 - [Contract Addresses](#contract-addresses)
 - [Tech Stack](#tech-stack)
 - [Contributing](#contributing)
@@ -210,7 +210,7 @@ TribeProtocol creates a permissionless, non-custodial copy trading infrastructur
 
 ## 🧪 Testing
 
-Comprehensive test results available in [TEST_RESULTS.md](./TEST_RESULTS.md)
+Security and test verification available in [SECURITY.md](./SECURITY.md)
 
 ```bash
 # Run all tests
@@ -222,7 +222,7 @@ forge test --match-test testCopyTradingFlow -vvv
 
 ## 🏗 Architecture
 
-Detailed architecture documentation available in [ARCHITECTURE.md](./ARCHITECTURE.md)
+Detailed architecture documentation available in [DOCS.md](./DOCS.md)
 
 Key components:
 - Vault Factory & Copy Vaults
