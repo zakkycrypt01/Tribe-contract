@@ -3,7 +3,7 @@
 ![Base](https://img.shields.io/badge/Base-Blockchain-blue)
 ![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.20-363636)
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Architecture](https://img.shields.io/badge/Architecture-Documented-brightgreen)
+[![Architecture](https://img.shields.io/badge/Architecture-Documented-brightgreen)](./architecture.md)
 
 Key highlights:
 - Non-custodial vault-per-follower model
