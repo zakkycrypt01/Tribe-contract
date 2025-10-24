@@ -221,7 +221,7 @@ forge test --match-test testCopyTradingFlow -vvv
 
 ## 🏗 Architecture
 
-Detailed architecture documentation available in [architecture.md](./architecture.md)
+Detailed architecture documentation available in [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 Key components:
 - Vault Factory & Copy Vaults
