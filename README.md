@@ -3,7 +3,7 @@
 ![Base](https://img.shields.io/badge/Base-Blockchain-blue)
 ![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.20-363636)
 ![License](https://img.shields.io/badge/License-MIT-green)
-[![Docs](https://img.shields.io/badge/Docs-Complete-brightgreen)](./docs/index.md)
+[![Architecture](https://img.shields.io/badge/Architecture-Documented-brightgreen)](./CODE_OF_CONDUCT.md)
 [![Security](https://img.shields.io/badge/Security-Verified-success)](./SECURITY.md)
 
 Key highlights:
@@ -133,7 +133,7 @@ TribeProtocol is a decentralized copy trading protocol built for Base, enabling 
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Documentation](./docs/index.md)
+- [Architecture](./CODE_OF_CONDUCT.md)
 - [Security](./SECURITY.md)
 - [Contract Addresses](#contract-addresses)
 - [Tech Stack](#tech-stack)
